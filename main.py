@@ -1,14 +1,13 @@
-import requests
-import os
 import json
 import logging
-
+import os
 from datetime import datetime
 
-import httplib2
 import apiclient
-from oauth2client.service_account import ServiceAccountCredentials
+import httplib2
+import requests
 from dotenv import load_dotenv
+from oauth2client.service_account import ServiceAccountCredentials
 
 load_dotenv('.env')
 BASE_URL = os.getenv("BASE_URL")
@@ -69,7 +68,7 @@ def get_cell(service) -> str:
         date_value = datetime.fromtimestamp(last_value['date']).date()
         if date_value == datetime.now().date():
             return f'A{len(values["values"])}:A{len(values["values"])}'
-        return f'A{len(values["values"])+1}:A{len(values["values"])+1}'
+        return f'A{len(values["values"]) + 1}:A{len(values["values"]) + 1}'
     else:
         return 'A1:A1'
 
@@ -79,7 +78,7 @@ def write_events() -> None:
 
     events = prepare_value(get_events())
     cell = get_cell(service)
-    values = service.spreadsheets().values().update(
+    service.spreadsheets().values().update(
         range=cell,
         spreadsheetId=os.getenv('SPREADSHEET_ID'),
         valueInputOption='RAW',
@@ -89,7 +88,6 @@ def write_events() -> None:
             "values": [[events]]
         }
     ).execute()
-    return values
 
 
 def create_google_sheets_service():
